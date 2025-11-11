@@ -16,14 +16,19 @@ export default function LoginPage() {
     
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      router.push('/dashboard')
-    } catch (error: any) {
-      if (error.code === 'auth/user-not-found') {
-        setError('No account found with this email')
-      } else if (error.code === 'auth/wrong-password') {
-        setError('Incorrect password')
-      } else if (error.code === 'auth/invalid-email') {
-        setError('Invalid email address')
+      router.push('/')
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'code' in error) {
+        const firebaseError = error as { code: string }
+        if (firebaseError.code === 'auth/user-not-found') {
+          setError('No account found with this email')
+        } else if (firebaseError.code === 'auth/wrong-password') {
+          setError('Incorrect password')
+        } else if (firebaseError.code === 'auth/invalid-email') {
+          setError('Invalid email address')
+        } else {
+          setError('Failed to login. Please try again.')
+        }
       } else {
         setError('Failed to login. Please try again.')
       }
@@ -81,7 +86,7 @@ export default function LoginPage() {
             className="text-sm text-yellow-900 hover:text-yellow-700 font-medium"
             onClick={() => router.push('/register')}
           >
-            Don't have an account? Register
+            Don&apos;t have an account? Register
           </button>
         </div>
       </div>

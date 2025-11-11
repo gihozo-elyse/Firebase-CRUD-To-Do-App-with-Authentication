@@ -21,11 +21,16 @@ export default function RegisterPage() {
       await createUserWithEmailAndPassword(auth, email, password)
       alert('Account created successfully! Please login.')
       router.push('/login')
-    } catch (error: any) {
-      if (error.code === 'auth/email-already-in-use') {
-        alert('Email is already registered')
-      } else if (error.code === 'auth/invalid-email') {
-        alert('Invalid email address')
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'code' in error) {
+        const firebaseError = error as { code: string }
+        if (firebaseError.code === 'auth/email-already-in-use') {
+          alert('Email is already registered')
+        } else if (firebaseError.code === 'auth/invalid-email') {
+          alert('Invalid email address')
+        } else {
+          alert('Failed to create account. Please try again.')
+        }
       } else {
         alert('Failed to create account. Please try again.')
       }
